@@ -11,6 +11,13 @@ The service wraps the Open-AutoGLM phone agent loop:
 4. Repeat until the model returns `finish(...)`, asks for takeover, or reaches the
    configured step limit.
 
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=yzqvaPJY4t0">
+    <img src="https://img.youtube.com/vi/yzqvaPJY4t0/maxresdefault.jpg" width="800">
+  </a>
+</p>
+
+
 ## Requirements
 
 - Python 3.10+
