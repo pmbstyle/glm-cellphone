@@ -132,3 +132,18 @@ Connect an MCP client to `/mcp` on the same service. The server exposes:
 
 Agents should not provide runtime metrics such as duration or executed step
 count. Those are produced by the service and returned in status/result tools.
+
+Example config:
+```json
+"glm_cellphone": {
+  "type": "streamable_http",
+  "url": "http://<Tailscale_IP>:8787/mcp/",
+  "description": "Control a connected Android phone through GLM Cellphone. Starts tasks, polls progress, fetches results, and can stop active runs.",
+  "tools": [
+    "start_phone_task",
+    "get_phone_task_status",
+    "get_phone_task_result",
+    "stop_phone_task"
+  ]
+}
+```
