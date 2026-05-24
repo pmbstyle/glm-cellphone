@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from glm_cellphone.config import get_settings
 from glm_cellphone.mcp_server import _artifact_payload, _summarize_logs
 from glm_cellphone.schemas import ArtifactRecord
 
@@ -19,7 +20,9 @@ def test_summarize_logs_extracts_latest_step_and_action():
     assert summary["last_action"] == "{'_metadata': 'do', 'action': 'Launch'}"
 
 
-def test_artifact_payload_keeps_relative_url_by_default():
+def test_artifact_payload_keeps_relative_url_without_public_base(monkeypatch):
+    monkeypatch.setenv("GLM_CELLPHONE_PUBLIC_BASE_URL", "")
+    get_settings.cache_clear()
     artifact = ArtifactRecord(
         id="artifact-1",
         job_id="job-1",
@@ -31,7 +34,10 @@ def test_artifact_payload_keeps_relative_url_by_default():
         created_at=datetime.now(timezone.utc),
     )
 
-    payload = _artifact_payload(artifact)
+    try:
+        payload = _artifact_payload(artifact)
+    finally:
+        get_settings.cache_clear()
 
     assert payload["url"] == "/artifacts/job-1/run.log"
     assert "path" not in payload

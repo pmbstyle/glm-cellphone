@@ -26,6 +26,7 @@ ZAI_KEY=your-key
 PHONE_AGENT_BASE_URL=https://api.z.ai/api/coding/paas/v4
 PHONE_AGENT_MODEL=autoglm-phone-multilingual
 GLM_CELLPHONE_PUBLIC_BASE_URL=http://your-host:8787
+GLM_CELLPHONE_MCP_ALLOWED_HOSTS=your-host:*
 ADB_PATH=/absolute/path/to/adb
 ```
 
@@ -56,6 +57,12 @@ http://127.0.0.1:8787/mcp
 Set `GLM_CELLPHONE_PUBLIC_BASE_URL` when MCP clients connect through another
 host name, IP address, or private network name. Artifact URLs returned by MCP
 tools will use that base URL.
+
+The MCP transport validates `Host` headers. The host from
+`GLM_CELLPHONE_PUBLIC_BASE_URL` is allowed automatically. Add comma-separated
+extra values to `GLM_CELLPHONE_MCP_ALLOWED_HOSTS` when clients connect through
+additional names or IP addresses, for example `phone-mac:*` or
+`100.64.0.10:*`.
 
 Run history is stored under `data/`:
 

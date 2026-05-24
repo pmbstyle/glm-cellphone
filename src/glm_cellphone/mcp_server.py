@@ -6,6 +6,7 @@ from typing import Any, Literal
 from fastapi import HTTPException
 from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp.exceptions import ToolError
+from mcp.server.transport_security import TransportSecuritySettings
 
 from .config import get_settings
 from .schemas import ArtifactRecord, JobRecord, TaskRequest, TaskStatus
@@ -25,6 +26,15 @@ mcp = FastMCP(
     ),
     json_response=True,
     streamable_http_path="/",
+    transport_security=TransportSecuritySettings(
+        enable_dns_rebinding_protection=True,
+        allowed_hosts=get_settings().allowed_mcp_hosts,
+        allowed_origins=[
+            "http://127.0.0.1:*",
+            "http://localhost:*",
+            "http://[::1]:*",
+        ],
+    ),
 )
 
 

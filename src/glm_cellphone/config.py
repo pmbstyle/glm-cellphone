@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from urllib.parse import urlparse
 
 from pydantic import AliasChoices, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -30,6 +31,10 @@ class Settings(BaseSettings):
         default=None,
         validation_alias="GLM_CELLPHONE_PUBLIC_BASE_URL",
     )
+    mcp_allowed_hosts: str = Field(
+        default="",
+        validation_alias="GLM_CELLPHONE_MCP_ALLOWED_HOSTS",
+    )
 
     @property
     def resolved_api_key(self) -> str | None:
@@ -41,6 +46,23 @@ class Settings(BaseSettings):
     @property
     def extra_adb_paths(self) -> list[str]:
         return [item.strip() for item in self.adb_extra_paths.split(":") if item.strip()]
+
+    @property
+    def allowed_mcp_hosts(self) -> list[str]:
+        hosts = ["127.0.0.1:*", "localhost:*", "[::1]:*"]
+        if self.public_base_url:
+            parsed = urlparse(self.public_base_url)
+            if parsed.hostname:
+                if ":" in parsed.hostname and not parsed.hostname.startswith("["):
+                    hosts.append(f"[{parsed.hostname}]:*")
+                else:
+                    hosts.append(f"{parsed.hostname}:*")
+        hosts.extend(
+            item.strip()
+            for item in self.mcp_allowed_hosts.split(",")
+            if item.strip()
+        )
+        return list(dict.fromkeys(hosts))
 
 
 @lru_cache
