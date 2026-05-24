@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     adb_path: str | None = Field(default=None, validation_alias="ADB_PATH")
     adb_extra_paths: str = Field(default="", validation_alias="ADB_EXTRA_PATHS")
     state_dir: str = Field(default="data", validation_alias="GLM_CELLPHONE_STATE_DIR")
+    public_base_url: str | None = Field(
+        default=None,
+        validation_alias="GLM_CELLPHONE_PUBLIC_BASE_URL",
+    )
 
     @property
     def resolved_api_key(self) -> str | None:

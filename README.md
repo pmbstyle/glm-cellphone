@@ -25,6 +25,7 @@ Supported `.env` keys:
 ZAI_KEY=your-key
 PHONE_AGENT_BASE_URL=https://api.z.ai/api/coding/paas/v4
 PHONE_AGENT_MODEL=autoglm-phone-multilingual
+GLM_CELLPHONE_PUBLIC_BASE_URL=http://your-host:8787
 ADB_PATH=/absolute/path/to/adb
 ```
 
@@ -45,6 +46,16 @@ http://127.0.0.1:8787/
 
 The default bind host is `0.0.0.0`. Override with `GLM_CELLPHONE_HOST` and
 `GLM_CELLPHONE_PORT` if needed.
+
+The MCP endpoint starts with the HTTP service:
+
+```text
+http://127.0.0.1:8787/mcp
+```
+
+Set `GLM_CELLPHONE_PUBLIC_BASE_URL` when MCP clients connect through another
+host name, IP address, or private network name. Artifact URLs returned by MCP
+tools will use that base URL.
 
 Run history is stored under `data/`:
 
@@ -91,3 +102,17 @@ List stored runs and stats:
 curl http://127.0.0.1:8787/jobs
 curl http://127.0.0.1:8787/stats
 ```
+
+## MCP Tools
+
+Connect an MCP client to `/mcp` on the same service. The server exposes:
+
+- `start_phone_task`: start a background Android task and return a `job_id`.
+- `get_phone_task_status`: poll concise progress, latest step/log lines, and
+  artifact count.
+- `get_phone_task_result`: fetch final result, steps summary, artifacts, and
+  log tail once the run reaches a terminal status.
+- `stop_phone_task`: request a cooperative stop for a queued or running task.
+
+Agents should not provide runtime metrics such as duration or executed step
+count. Those are produced by the service and returned in status/result tools.

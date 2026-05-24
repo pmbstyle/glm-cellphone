@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import uuid
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -14,6 +15,7 @@ from .artifacts import ArtifactRecorder
 from .config import get_settings
 from .control import JobControl
 from .logs import TaskLog
+from .mcp_server import mcp
 from .runner import PhoneTaskRunner
 from .schemas import (
     ClearHistoryResponse,
@@ -42,7 +44,15 @@ state_dir = Path(settings.state_dir)
 artifact_root = state_dir / "artifacts"
 store = JobStore(state_dir / "glm-cellphone.sqlite3")
 
-app = FastAPI(title="GLM Cellphone", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with mcp.session_manager.run():
+        yield
+
+
+app = FastAPI(title="GLM Cellphone", version="0.1.0", lifespan=lifespan)
+app.mount("/mcp", mcp.streamable_http_app(), name="mcp")
 app.mount("/artifacts", StaticFiles(directory=artifact_root, check_dir=False), name="artifacts")
 app.mount(
     "/static",
