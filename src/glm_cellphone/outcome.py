@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -7,53 +8,34 @@ from .schemas import TaskStatus
 
 TAKEOVER_ACTIONS = {"Take_over", "Interact"}
 
-FAILURE_MARKERS = (
-    "unable",
-    "can't",
-    "cannot",
-    "could not",
-    "failed",
-    "failure",
-    "not found",
-    "no suitable",
-    "not available",
-    "not possible",
-    "cancelled",
-    "canceled",
-    "incomplete",
-    "unsuccessful",
-    "error",
-    "не удалось",
-    "не могу",
-    "не смог",
-    "не найд",
-    "невозможно",
-    "ошиб",
-    "отмен",
-    "нет подход",
-    "无法",
-    "不能",
-    "未找到",
-    "没有合适",
-    "失败",
-    "错误",
+DIAGNOSTIC_PREFIX_CHARS = 320
+
+FAILURE_PATTERNS = (
+    r"^(?:i\s+)?(?:am\s+)?unable\b",
+    r"^(?:i\s+)?(?:can(?:not|'t)|could not)\b",
+    r"^(?:i\s+)?failed\b",
+    r"^(?:the\s+)?task\s+(?:failed|is\s+incomplete|was\s+incomplete)\b",
+    r"^(?:an?\s+)?error\b",
+    r"^(?:no|not)\s+(?:matching|suitable|available)\b",
+    r"\b(?:could not find|not found|no suitable|not available|not possible)\b",
+    r"\b(?:не удалось|не могу|не смог|не найд|невозможно|ошиб|отмен|нет подход)\b",
+    r"(?:无法|不能|未找到|没有合适|失败|错误)",
 )
 
-RETRYABLE_MARKERS = (
-    "model error",
-    "api",
-    "timeout",
-    "timed out",
-    "connection",
-    "network",
-    "rate limit",
-    "temporary",
-    "temporarily",
-    "unknown action",
-    "failed to parse",
-    "action failed",
-    "app not found",
-    "max steps reached",
+RETRYABLE_PATTERNS = (
+    r"\bmodel error\b",
+    r"\bapi\b",
+    r"\btimeout\b",
+    r"\btimed out\b",
+    r"\bconnection\b",
+    r"\bnetwork\b",
+    r"\brate limit\b",
+    r"\btemporar(?:y|ily)\b",
+    r"\bunknown action\b",
+    r"\bfailed to parse\b",
+    r"\baction failed\b",
+    r"\bapp not found\b",
+    r"\bmax steps reached\b",
 )
 
 
@@ -111,15 +93,15 @@ def classify_step_outcome(
 def is_failure_message(message: str | None) -> bool:
     if not message:
         return False
-    lowered = message.lower()
-    return any(marker in lowered for marker in FAILURE_MARKERS)
+    lead = _diagnostic_lead(message)
+    return any(re.search(pattern, lead) for pattern in FAILURE_PATTERNS)
 
 
 def is_retryable_message(message: str | None) -> bool:
     if not message:
         return False
-    lowered = message.lower()
-    return any(marker in lowered for marker in RETRYABLE_MARKERS)
+    lead = _diagnostic_lead(message)
+    return any(re.search(pattern, lead) for pattern in RETRYABLE_PATTERNS)
 
 
 def _action_message(action: dict[str, Any] | None) -> str | None:
@@ -128,3 +110,7 @@ def _action_message(action: dict[str, Any] | None) -> str | None:
     value = action.get("message")
     return value if isinstance(value, str) else None
 
+
+def _diagnostic_lead(message: str) -> str:
+    normalized = re.sub(r"\s+", " ", message.strip().lower())
+    return normalized[:DIAGNOSTIC_PREFIX_CHARS]
