@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GLM Cellphone Runs</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>GLM Cellphone</h1>
+        <p>Local Android agent runs, logs, steps, and artifacts.</p>
+      </div>
+      <div class="top-actions">
+        <select id="themeInput" aria-label="Theme">
+          <option value="auto">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+        <div class="health" id="health">Checking...</div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <div class="left-column">
+        <section class="panel run-panel">
+          <div class="panel-head">
+            <h2>New Run</h2>
+            <button id="refreshButton" type="button">Refresh</button>
+          </div>
+          <form id="runForm">
+            <label>
+              Task
+              <textarea
+                id="taskInput"
+                rows="5"
+                placeholder="Open the target app and complete the requested task."
+                required
+              ></textarea>
+            </label>
+            <div class="form-grid">
+              <label>
+                Device ID
+                <input id="deviceInput" placeholder="auto" />
+              </label>
+              <label>
+                Max steps
+                <input id="stepsInput" type="number" min="1" max="100" value="20" />
+              </label>
+              <label>
+                Retries
+                <input id="retriesInput" type="number" min="0" max="3" value="0" />
+              </label>
+              <label>
+                Language
+                <select id="langInput">
+                  <option value="en">English</option>
+                  <option value="cn">Chinese</option>
+                </select>
+              </label>
+            </div>
+            <label class="checkbox">
+              <input id="sensitiveInput" type="checkbox" />
+              Allow sensitive actions
+            </label>
+            <button class="primary" type="submit">Start Run</button>
+          </form>
+        </section>
+
+        <section class="panel jobs-panel">
+          <div class="panel-head">
+            <h2>Runs</h2>
+            <div class="panel-actions">
+              <button id="clearHistoryButton" type="button">Clear History</button>
+              <span id="jobCount"></span>
+            </div>
+          </div>
+          <div class="jobs" id="jobs"></div>
+        </section>
+      </div>
+
+      <div class="right-column">
+        <section class="stats-grid" id="statsGrid"></section>
+
+        <section class="panel detail-panel">
+          <div class="panel-head">
+            <h2>Run Detail</h2>
+            <span id="selectedJob"></span>
+          </div>
+          <div id="detail" class="detail-empty">Select a run.</div>
+        </section>
+      </div>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

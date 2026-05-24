@@ -1,0 +1,41 @@
+[project]
+name = "glm-cellphone"
+version = "0.1.0"
+description = "Local API service for controlling an Android phone with AutoGLM."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "openai>=2.9.0",
+    "phone-agent @ git+https://github.com/zai-org/Open-AutoGLM.git@main",
+    "pydantic-settings>=2.6.0",
+    "python-dotenv>=1.0.1",
+    "uvicorn[standard]>=0.30.0",
+]
+
+[project.scripts]
+glm-cellphone = "glm_cellphone.server:main"
+
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.0",
+    "pytest>=8.3.0",
+    "ruff>=0.8.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
