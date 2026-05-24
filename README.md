@@ -1,7 +1,9 @@
 # GLM Cellphone
 
 Local HTTP service for running AutoGLM phone-agent tasks against a connected Android
-device.
+device. Has API and MCP servers. Great as an agentic tool.
+
+Using Z.AI subscription plan.
 
 The service wraps the Open-AutoGLM phone agent loop:
 
